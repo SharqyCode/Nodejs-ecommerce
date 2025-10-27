@@ -6,7 +6,7 @@ const {getAllUsers,
     updateUser,
     deleteUser}=require("./../controllers/userController")
 
-const {signup,login}=require('../controllers/authController')
+const {signup,login, protectLogOnly,restrictTo}=require('../controllers/authController')
 
 
 const router=express.Router();
@@ -15,6 +15,6 @@ router.post('/login',login);
 
 
 router.route(`/`).get(getAllUsers).post(createUser);
-router.route(`/:id`).get(getUser).patch(updateUser).delete(deleteUser);
+router.route(`/:id`).get(getUser).patch(updateUser).delete(protectLogOnly,restrictTo('admin'),deleteUser);
 
 module.exports=router;
