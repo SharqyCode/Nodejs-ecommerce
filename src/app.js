@@ -14,10 +14,12 @@ app.use(express.json());
 
 // Base API prefix
 app.use("/api", routes);
+// Error handling
+app.use((req, res) => {
+    res.send("400 Invalid route or method. try again.")
+})
 
-app.use(`/api/users`, userRouter);
 
-app.use('/api/orders', orderRouter);
 
 
 const PORT = process.env.PORT || 5000;
