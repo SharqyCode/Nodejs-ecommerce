@@ -6,12 +6,14 @@ const {getAllUsers,
     updateUser,
     deleteUser}=require("./../controllers/userController")
 
-const {signup,login, protectLogOnly,restrictTo}=require('../controllers/authController')
+const {signup,login, protectLogOnly,restrictTo,resetPassword,forgotPassword}=require('../controllers/authController')
 
 
 const router=express.Router();
 router.post('/signup',signup)
 router.post('/login',login);
+router.post('/forgetpass',forgotPassword)
+router.patch('/resetPassword/:token',resetPassword)
 
 
 router.route(`/`).get(getAllUsers).post(createUser);

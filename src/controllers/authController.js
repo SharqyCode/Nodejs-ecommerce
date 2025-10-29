@@ -3,7 +3,8 @@ const User=require('./../models/userModel')
 const catchAsync=require('./../utils/catchAsync')
 const jwt=require('jsonwebtoken')
 const {promisify}=require('util')
-
+const sendEmail=require('./../utils/email')
+const crypto=require('crypto')
 const signToken=id=>{
     return jwt.sign({
             id: id
@@ -104,9 +105,80 @@ const restrictTo=(...roles)=>{
         }
 }
 
+const forgotPassword=catchAsync(async (req,res,next)=>{
+  console.log('wwwwwwwwwwwwwwwwwww',req.body)
+  const user =await User.findOne({email: req.body.email})
+  console.log('userrrrr',user)
+  if(!user){
+    return next(new AppError('There is no user with email address.',404))
+  }
+
+
+  const resetToken=user.createPasswordResetToken() 
+  await user.save({validateBeforeSave:false})
+
+  const resetURL=`${req.protocol}://${req.get('host')}/api/users/resetPassword/${resetToken}`
+
+  const message=`Forgot your password ? submit a a PATCH request with you new password and password confirm to: ${resetURL}.\n if you didnot forget your password please ignor this email !`
+try{
+  await sendEmail({
+    email:user.email,
+    subject:'Yur password reset token valid for 10 min',
+    message:message
+  })}
+  catch(err){
+    user.passwordResetToken=undefined
+    user.passwordResetExpires=undefined;
+    await user.save({validateBeforeSave:false})
+    return next(new AppError('there was an error sending the emial try again later !'),500)
+  }
+
+res.status(200).json({
+  status:'success',
+  message:'Token sent to email!'
+
+})
+
+})
+const resetPassword = catchAsync(async (req,res,next)=>{
+
+  // 1️⃣ Get user by token
+  const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
+  console.log(hashedToken)
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() }
+  });
+
+  if(!user){
+    return next(new AppError('Token is invalid or has expired',400));
+  }
+
+  // 2️⃣ Update password
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  user.passwordChangeAt = Date.now();
+  await user.save();
+
+  // 3️⃣ Send JWT
+  const token = signToken(user._id);
+  res.status(200).json({
+    status:'success',
+    token
+  });
+
+});
+
+
+
 module.exports={
 signup,
 login,
 protectLogOnly,
-restrictTo
+restrictTo,
+resetPassword,
+forgotPassword
+
 }
