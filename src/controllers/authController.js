@@ -142,7 +142,7 @@ res.status(200).json({
 })
 const resetPassword = catchAsync(async (req,res,next)=>{
 
-  // 1️⃣ Get user by token
+  
   const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
   console.log(hashedToken)
   const user = await User.findOne({
@@ -154,7 +154,7 @@ const resetPassword = catchAsync(async (req,res,next)=>{
     return next(new AppError('Token is invalid or has expired',400));
   }
 
-  // 2️⃣ Update password
+  
   user.password = req.body.password;
   user.passwordConfirm = req.body.passwordConfirm;
   user.passwordResetToken = undefined;
@@ -162,7 +162,7 @@ const resetPassword = catchAsync(async (req,res,next)=>{
   user.passwordChangeAt = Date.now();
   await user.save();
 
-  // 3️⃣ Send JWT
+  
   const token = signToken(user._id);
   res.status(200).json({
     status:'success',
