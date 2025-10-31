@@ -1,5 +1,5 @@
 // controllers/userController.js
-const User = require('../models/User');
+const User = require('./../models/UserModel');
 const catchAsync = require('./../utils/catchAsync');
 const getAllUsers = catchAsync(async (req, res) => {
   const users = await User.find();
@@ -93,10 +93,10 @@ const uploadAvatar = catchAsync(async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ status: "fail", message: "No file uploaded" });
   }
-console.log(`requsest body ${req.file.filename}`)
+  console.log(`requsest body ${req.file.filename}`)
   const user = await User.findByIdAndUpdate(
     req.params.id,
-    { avatar: `uploads/${req.file.filename}`},
+    { avatar: `uploads/${req.file.filename}` },
     { new: true }
   );
 
@@ -121,26 +121,26 @@ const updateProfile = catchAsync(async (req, res) => {
   if (name) user.name = name;
   if (email) user.email = email;
 
-  
+
   if (newPassword) {
-  if (!oldPassword) {
-    return res.status(400).json({
-      status: "fail",
-      message: "Please provide your old password to set a new one",
-    });
-  }
+    if (!oldPassword) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Please provide your old password to set a new one",
+      });
+    }
 
-  const isMatch = await bcrypt.compare(oldPassword, user.password);
-  if (!isMatch) {
-    return res.status(401).json({
-      status: "fail",
-      message: "Incorrect old password",
-    });
-  }
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({
+        status: "fail",
+        message: "Incorrect old password",
+      });
+    }
 
-  user.password = newPassword;
-  user.passwordConfirm = newPassword; 
-}
+    user.password = newPassword;
+    user.passwordConfirm = newPassword;
+  }
 
   await user.save();
 
