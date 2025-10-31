@@ -1,3 +1,4 @@
+const Category = require("../models/Category");
 const Product = require("../models/Product");
 
 const getAllProducts = async () => {
@@ -9,8 +10,9 @@ const getProductById = async (id) => {
 };
 
 const createProduct = async (data) => {
+
     const product = new Product(data);
-    return await product.save().populate('category', 'name parentCategory');;
+    return await product.save();
 };
 
 const updateProduct = async (id, data) => {

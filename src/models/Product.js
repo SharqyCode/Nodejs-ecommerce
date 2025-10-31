@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const { default: slugify } = require("slugify");
+// const Category = require("../models/Category")
 
 const productSchema = new mongoose.Schema(
     {
@@ -62,6 +64,12 @@ productSchema.pre("save", function (next) {
     next();
 });
 
+
+// productSchema.pre("save", async function (next) {
+
+//     next()
+// }
+// );
 
 
 module.exports = mongoose.model("Product", productSchema);
