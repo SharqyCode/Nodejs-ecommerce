@@ -71,10 +71,96 @@ const deleteUser = catchAsync(async (req, res) => {
   });
 });
 
+const getProfile = catchAsync(async (req, res) => {
+  const user = await User.findById(req.user.id).select('-password');
+
+  if (!user) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'User not found',
+    });
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      user,
+    },
+  });
+});
+
+const uploadAvatar = catchAsync(async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ status: "fail", message: "No file uploaded" });
+  }
+console.log(`requsest body ${req.file.filename}`)
+  const user = await User.findByIdAndUpdate(
+    req.params.id,
+    { avatar: `uploads/${req.file.filename}`},
+    { new: true }
+  );
+
+  res.status(200).json({
+    status: "success",
+    data: { user },
+  });
+});
+
+const bcrypt = require("bcryptjs");
+
+const updateProfile = catchAsync(async (req, res) => {
+  const userId = req.user.id;
+  const { name, email, oldPassword, newPassword } = req.body;
+
+  const user = await User.findById(userId).select("+password");
+  if (!user) {
+    return res.status(404).json({ status: "fail", message: "User not found" });
+  }
+
+
+  if (name) user.name = name;
+  if (email) user.email = email;
+
+  
+  if (newPassword) {
+  if (!oldPassword) {
+    return res.status(400).json({
+      status: "fail",
+      message: "Please provide your old password to set a new one",
+    });
+  }
+
+  const isMatch = await bcrypt.compare(oldPassword, user.password);
+  if (!isMatch) {
+    return res.status(401).json({
+      status: "fail",
+      message: "Incorrect old password",
+    });
+  }
+
+  user.password = newPassword;
+  user.passwordConfirm = newPassword; 
+}
+
+  await user.save();
+
+  res.status(200).json({
+    status: "success",
+    message: "Profile updated successfully",
+    data: { user },
+  });
+});
+
+
+
+
 module.exports = {
   getAllUsers,
   getUser,
   createUser,
   updateUser,
   deleteUser,
+  getProfile,
+  uploadAvatar,
+  updateProfile
 };
