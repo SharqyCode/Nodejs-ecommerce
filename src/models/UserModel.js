@@ -40,6 +40,10 @@ const userSchema = new mongoose.Schema({
             message: "passwords are not the same"
         }
     },
+    avatar: {
+    type: String, 
+    default: "",
+  },
    passwordChangeAt:Date ,
     passwordResetToken:String,
     passwordResetExpires:Date 

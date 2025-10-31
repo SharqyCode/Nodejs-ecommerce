@@ -11,7 +11,7 @@ const orderRouter = require("./routes/orderRoutes");
 const passport = require('passport');
 const session = require('express-session');
 const authRoutes = require('./routes/authRoutes');
-
+const path = require("path");
 
 // connectDB();
 
@@ -26,6 +26,7 @@ app.use(`/api/users`, userRouter);
 
 app.use("/api/orders", orderRouter);
 
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(session({ secret: 'someSecret', resave: false, saveUninitialized: true }));
 app.use(passport.initialize());
