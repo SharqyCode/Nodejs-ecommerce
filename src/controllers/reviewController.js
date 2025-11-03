@@ -25,7 +25,8 @@ const getReview = async (req, res) => {
 // POST /api/reviews
 const createReview = async (req, res) => {
     try {
-        const newReview = await reviewService.createReview(req.body);
+        console.log(req.body);
+        const newReview = await reviewService.createReview(req.body.review);
         res.status(201).json(newReview);
     } catch (error) {
         res.status(400).json({ message: error.message });

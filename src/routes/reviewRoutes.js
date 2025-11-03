@@ -3,9 +3,8 @@ const { getReviews, createReview, getReview, deleteReview, updateReview } = requ
 
 const router = express().router;
 
-router.route("/:product")
-    .get(getReviews)
-    .post(createReview);
+router.route("/:product").get(getReviews)
+router.route("/").post(createReview);
 
 router.route("/:id")
     .get(getReview)
