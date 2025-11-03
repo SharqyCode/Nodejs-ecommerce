@@ -11,9 +11,20 @@ const getProducts = async (req, res) => {
 };
 
 // GET /api/products/:id
-const getProduct = async (req, res) => {
+const getProductById = async (req, res) => {
     try {
         const product = await productService.getProductById(req.params.id);
+        if (!product) return res.status(404).json({ message: "Product not found" });
+        res.status(200).json(product);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// GET /api/products/:slug
+const getProductBySlug = async (req, res) => {
+    try {
+        const product = await productService.getProductBySlug(req.params.slug);
         if (!product) return res.status(404).json({ message: "Product not found" });
         res.status(200).json(product);
     } catch (error) {
@@ -55,8 +66,9 @@ const deleteProduct = async (req, res) => {
 
 module.exports = {
     getProducts,
-    getProduct,
+    getProductById,
+    getProductBySlug,
     createProduct,
     updateProduct,
-    deleteProduct,
-};
+    deleteProduct
+}

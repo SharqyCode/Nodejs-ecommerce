@@ -56,7 +56,7 @@ const seedProducts = async () => {
             ...p,
             slug: slugify(`${p.name}-${i + 1}`, { lower: true, strict: true }),
             sku: `${p.name.substring(0, 3).toUpperCase()}-${Date.now()}`,
-            rating: Math.floor(Math.random() * 5),
+            rating: 0,
             colors: ["Black", "White", "Gray"].slice(0, Math.floor(Math.random() * 3) + 1),
             sizes: [],
             dimensions: { length: null, width: null, height: null },

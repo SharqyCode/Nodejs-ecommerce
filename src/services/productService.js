@@ -9,6 +9,10 @@ const getProductById = async (id) => {
     return await Product.findById(id).populate('category', 'name parentCategory');
 };
 
+const getProductBySlug = async (slug) => {
+    return await Product.findOne({ slug }).populate('category', 'name parentCategory');
+};
+
 const createProduct = async (data) => {
 
     const product = new Product(data);
@@ -24,9 +28,10 @@ const deleteProduct = async (id) => {
 };
 
 module.exports = {
-    getAllProducts,
-    getProductById,
     createProduct,
     updateProduct,
+    getAllProducts,
+    getProductById,
+    getProductBySlug,
     deleteProduct,
-};
+}

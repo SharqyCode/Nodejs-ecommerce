@@ -22,7 +22,9 @@ app.use(express.json());
 // Base API prefix
 app.use("/api", routes);
 // Error handling
-
+// app.use((req, res) => {
+//     res.status(404).send("404: NOT FOUND. Invalid route or method. try again.")
+// })
 
 
 app.use("/api/orders", orderRouter);
