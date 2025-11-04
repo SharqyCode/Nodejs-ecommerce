@@ -36,14 +36,14 @@ passport.deserializeUser(async (id, done) => {
   done(null, user);
 });
 
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'],prompt : "select_account" }));
 
 router.get('/google/callback',
   passport.authenticate('google', { session: false, failureRedirect: '/login' }),
   (req, res) => {
 
     const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
-    res.json({ status: 'success', token });
+   res.redirect(`http://localhost:5174/auth/oauth-success?token=${token}`);
   }
 );
 
