@@ -7,23 +7,19 @@ const Product = require('../models/Product')
 
 
 exports.createOrder = catchAsync(async (req, res, next) => {
-  const { items } = req.body;
+  const { items, user } = req.body;
 
   if (!items || items.length === 0) {
     return res.status(400).json({
-      status: 'fail',
-      message: 'Order must contain at least one item',
+      status: "fail",
+      message: "Order must contain at least one item",
     });
   }
 
-
   const detailedItems = await Promise.all(
     items.map(async (item) => {
-      console.log(item.product)
       const product = await Product.findById(item.product);
-      if (!product) {
-        throw new Error(`Product not found: ${item.product}`);
-      }
+      if (!product) return null;
       return {
         product: item.product,
         quantity: item.quantity,
@@ -31,22 +27,31 @@ exports.createOrder = catchAsync(async (req, res, next) => {
       };
     })
   );
+
+  if (detailedItems.includes(null)) {
+    return res.status(400).json({
+      status: "fail",
+      message: "One or more products not found",
+    });
+  }
+
   const totalPrice = detailedItems.reduce(
     (acc, item) => acc + item.price * item.quantity,
     0
   );
 
   const order = await Order.create({
-    user: req.user._id,
+    user,
     items: detailedItems,
     totalPrice,
   });
 
-  res.status(201).json({
-    status: 'success',
+  return res.status(201).json({
+    status: "success",
     data: { order },
   });
 });
+
 
 exports.getMyOrders = catchAsync(async (req, res, next) => {
   const orders = await Order.find({ user: req.user.id }).populate({
