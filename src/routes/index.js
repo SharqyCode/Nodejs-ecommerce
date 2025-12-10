@@ -7,6 +7,9 @@ const reviewRoutes = require("./reviewRoutes");
 const stripe = require("stripe")("sk_test_51SOD7lDylaFolDrPtJnWIrwXvOJS4sJ4SXIDJELhBx1bMkQboG507iHcjGcnBaItM7zezjY7rf0HBRdQ3FbZCHOz00a8jcq4SO")
 const router = express.Router();
 
+const dotenv = require("dotenv");
+dotenv.config();
+
 router.use("/products", productRoutes);
 router.use(`/users`, userRoutes);
 router.use('/orders', orderRoutes);
@@ -27,13 +30,14 @@ router.post("/create-checkout-session", async (req, res) => {
         quantity: product.quantity
     }));
 
+    const frontendURL = process.env.FRONTEND_URL || 'http://localhost:5173'
     try {
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],
             line_items: lineItems, // ✅ note: use snake_case
             mode: "payment",
-            success_url: "http://localhost:5173/payment/success",
-            cancel_url: "http://localhost:5173/payment/cancel"
+            success_url: `${frontendURL}/payment/success`,
+            cancel_url: `${frontendURL}/payment/cancel`
         });
         res.json({ url: session.url }); // ✅ Stripe now gives a checkout URL directly
     } catch (err) {

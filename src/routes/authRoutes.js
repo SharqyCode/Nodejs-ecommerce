@@ -4,6 +4,9 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 
+const dotenv = require("dotenv");
+dotenv.config();
+
 const router = express.Router();
 
 passport.use(new GoogleStrategy({
@@ -42,8 +45,9 @@ router.get('/google/callback',
   passport.authenticate('google', { session: false, failureRedirect: '/login' }),
   (req, res) => {
 
+    const frontendURL = process.env.FRONTEND_URL || 'http://localhost:5173'
     const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
-    res.redirect(`http://localhost:5173/auth/oauth-success?token=${token}`);
+    res.redirect(`${frontendURL}/auth/oauth-success?token=${token}`);
   }
 );
 
