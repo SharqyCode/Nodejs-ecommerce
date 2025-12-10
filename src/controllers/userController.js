@@ -1,5 +1,5 @@
 // controllers/userController.js
-const User = require('./../models/UserModel');
+const User = require('./../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
 const getAllUsers = catchAsync(async (req, res) => {
   const users = await User.find();
